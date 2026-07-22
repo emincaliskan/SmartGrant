@@ -14,8 +14,9 @@ services:
     healthCheckPath: /
     autoDeploy: true
     envVars:
+      # node:sqlite needs Node 22.13+ (it is flag-gated in earlier 22.x builds)
       - key: NODE_VERSION
-        value: "22.12.0"
+        value: "22.22.2"
       - key: NODE_ENV
         value: production
       # Set your own case-officer invite code in the Render dashboard
