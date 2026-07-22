@@ -1,0 +1,31 @@
+# Render Blueprint for SmartGrant — deploy via render.com > New > Blueprint.
+#
+# Free plan note: the filesystem is ephemeral, so the SQLite database resets on
+# every deploy/restart (fine for a demo — the seed runs on boot). For data that
+# survives restarts, switch plan to "starter" and uncomment the disk section
+# plus the SMARTGRANT_DB_PATH env var below.
+services:
+  - type: web
+    name: smartgrant
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22.12.0"
+      - key: NODE_ENV
+        value: production
+      # Set your own case-officer invite code in the Render dashboard
+      # (sync: false means Render prompts you for the value; it is never
+      # committed to the repo).
+      - key: SMARTGRANT_OFFICER_CODE
+        sync: false
+      # - key: SMARTGRANT_DB_PATH
+      #   value: /var/data/smartgrant.db
+    # disk:
+    #   name: smartgrant-data
+    #   mountPath: /var/data
+    #   sizeGB: 1

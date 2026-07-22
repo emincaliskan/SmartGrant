@@ -6,6 +6,8 @@ const db = require('./db');
 
 const COOKIE = 'sg_session';
 const SESSION_HOURS = 12;
+// Behind Render (or any TLS-terminating proxy) mark cookies Secure in production.
+const SECURE_FLAG = process.env.NODE_ENV === 'production' ? '; Secure' : '';
 
 // Officer registration requires an invite code, mirroring the reality that
 // case-officer access would be provisioned, not self-service. Configurable
@@ -29,13 +31,13 @@ function createSession(res, userId) {
     token, userId, csrf, expires.toISOString()
   );
   res.setHeader('Set-Cookie',
-    `${COOKIE}=${token}; HttpOnly; SameSite=Lax; Path=/; Expires=${expires.toUTCString()}`);
+    `${COOKIE}=${token}; HttpOnly; SameSite=Lax; Path=/; Expires=${expires.toUTCString()}${SECURE_FLAG}`);
 }
 
 function destroySession(req, res) {
   const token = readToken(req);
   if (token) db.run('DELETE FROM sessions WHERE token = ?', token);
-  res.setHeader('Set-Cookie', `${COOKIE}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0`);
+  res.setHeader('Set-Cookie', `${COOKIE}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0${SECURE_FLAG}`);
 }
 
 function readToken(req) {
