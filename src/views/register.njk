@@ -1,0 +1,44 @@
+{% extends "layout.njk" %}
+{% import "macros.njk" as m %}
+{% block content %}
+<div class="sg-two-thirds">
+  {{ m.errorSummary(errors) }}
+  <h1 class="sg-heading-l">Create a SmartGrant account</h1>
+  <p>Farmers and land managers can register directly. Case-officer accounts need an RPA invite code.</p>
+
+  <form method="post" action="/register" novalidate>
+    <input type="hidden" name="_csrf" value="{{ csrf }}">
+
+    {{ m.input(errors, 'full_name', 'Full name', values.full_name, 'text', '', 'name') }}
+    {{ m.input(errors, 'email', 'Email address', values.email, 'email', 'We use this to sign you in and send updates about your applications.', 'email') }}
+
+    <div class="sg-form-group {{ m.hasError(errors, 'role') }}">
+      <fieldset class="sg-fieldset" aria-describedby="role-hint{% for e in errors %}{% if e.field == 'role' %} role-error{% endif %}{% endfor %}">
+        <legend class="sg-label">What type of account do you need?</legend>
+        <div class="sg-hint" id="role-hint">This decides what you can see and do in the service.</div>
+        {{ m.fieldError(errors, 'role') }}
+        <div class="sg-radios" id="role">
+          <div class="sg-radios__item">
+            <input class="sg-radios__input" id="role-farmer" name="role" type="radio" value="farmer" {% if values.role == 'farmer' %}checked{% endif %}>
+            <label class="sg-radios__label" for="role-farmer">Farmer or land manager — apply for and track grants</label>
+          </div>
+          <div class="sg-radios__item">
+            <input class="sg-radios__input" id="role-officer" name="role" type="radio" value="officer" {% if values.role == 'officer' %}checked{% endif %}>
+            <label class="sg-radios__label" for="role-officer">RPA case officer — review and decide applications</label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    {{ m.input(errors, 'business_name', 'Farm business name (farmers only)', values.business_name, 'text', 'As registered with the Rural Payments Agency.') }}
+    {{ m.input(errors, 'sbi', 'Single Business Identifier (SBI) (farmers only)', values.sbi, 'text', 'Your 9-digit SBI number, for example 106512347.', '', 'sg-input--width-10') }}
+    {{ m.input(errors, 'invite_code', 'Case-officer invite code (officers only)', values.invite_code, 'text', 'Provided by your RPA team administrator. Demo code: RPA-DEMO-2026.', '', 'sg-input--width-20') }}
+    {{ m.input(errors, 'password', 'Password', '', 'password', 'At least 8 characters.', 'new-password') }}
+    {{ m.input(errors, 'password_confirm', 'Confirm password', '', 'password', '', 'new-password') }}
+
+    <button type="submit" class="sg-button">Create account</button>
+  </form>
+
+  <p>Already have an account? <a href="/login">Sign in</a>.</p>
+</div>
+{% endblock %}

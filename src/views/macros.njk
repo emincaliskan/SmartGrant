@@ -1,0 +1,50 @@
+{% macro errorSummary(errors) %}
+  {% if errors and errors.length %}
+    <div class="sg-error-summary" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
+      <h2 class="sg-error-summary__title" id="error-summary-title">There is a problem</h2>
+      <ul class="sg-error-summary__list">
+        {% for e in errors %}
+          <li><a href="#{{ e.field }}">{{ e.message }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro fieldError(errors, field) %}
+  {% for e in errors %}
+    {% if e.field == field %}
+      <p class="sg-error-message" id="{{ field }}-error"><span class="sg-visually-hidden">Error:</span> {{ e.message }}</p>
+    {% endif %}
+  {% endfor %}
+{% endmacro %}
+
+{% macro hasError(errors, field) %}{% for e in errors %}{% if e.field == field %}sg-form-group--error{% endif %}{% endfor %}{% endmacro %}
+
+{% macro input(errors, field, label, value='', type='text', hint='', autocomplete='', width='') %}
+  <div class="sg-form-group {{ hasError(errors, field) }}">
+    <label class="sg-label" for="{{ field }}">{{ label }}</label>
+    {% if hint %}<div class="sg-hint" id="{{ field }}-hint">{{ hint }}</div>{% endif %}
+    {{ fieldError(errors, field) }}
+    <input class="sg-input {{ width }}" id="{{ field }}" name="{{ field }}" type="{{ type }}"
+           value="{{ value }}"
+           {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+           {% if hint %}aria-describedby="{{ field }}-hint"{% endif %}>
+  </div>
+{% endmacro %}
+
+{% macro statusTag(status) %}
+  {% if status == 'submitted' %}<strong class="sg-tag sg-tag--blue">Submitted</strong>
+  {% elif status == 'in_review' %}<strong class="sg-tag sg-tag--light-blue">In review</strong>
+  {% elif status == 'info_requested' %}<strong class="sg-tag sg-tag--yellow">Information requested</strong>
+  {% elif status == 'approved' %}<strong class="sg-tag sg-tag--green">Approved</strong>
+  {% elif status == 'rejected' %}<strong class="sg-tag sg-tag--red">Rejected</strong>
+  {% elif status == 'paid' %}<strong class="sg-tag sg-tag--purple">Paid</strong>
+  {% else %}<strong class="sg-tag">{{ status }}</strong>{% endif %}
+{% endmacro %}
+
+{% macro riskTag(band) %}
+  {% if band == 'High' %}<strong class="sg-tag sg-tag--red">High priority</strong>
+  {% elif band == 'Medium' %}<strong class="sg-tag sg-tag--yellow">Medium priority</strong>
+  {% else %}<strong class="sg-tag sg-tag--green">Low priority</strong>{% endif %}
+{% endmacro %}

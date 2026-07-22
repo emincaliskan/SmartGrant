@@ -1,0 +1,139 @@
+{% extends "layout.njk" %}
+{% block content %}
+<div class="sg-two-thirds">
+  <span class="sg-caption-l">Defra AI Opportunity Assessment · Stage 3</span>
+  <h1 class="sg-heading-xl">The evidence behind SmartGrant</h1>
+  <p class="sg-lead">{{ concept.name }} — {{ concept.strapline }} <em>({{ concept.gapRef }})</em>.
+  Everything on this page is drawn verbatim from the Stage 1 evidence base and Stage 2 options
+  assessment (evidence current as at {{ stage1.asAt }}).</p>
+
+  <h2 class="sg-heading-m">The gap it closes</h2>
+  <dl class="sg-summary-list">
+    <div class="sg-summary-list__row"><dt>Gap</dt><dd>{{ gap.id }} — {{ gap.gap }} (ranked {{ gap.rank }} of 10)</dd></div>
+    <div class="sg-summary-list__row"><dt>User group</dt><dd>{{ gap.userGroup }}</dd></div>
+    <div class="sg-summary-list__row"><dt>Current service</dt><dd>{{ gap.currentService }}</dd></div>
+    <div class="sg-summary-list__row"><dt>Current capability</dt><dd>{{ gap.currentCapability }}</dd></div>
+    <div class="sg-summary-list__row"><dt>Evidence of need</dt><dd>{{ gap.evidenceOfNeed }}</dd></div>
+    <div class="sg-summary-list__row"><dt>Severity</dt><dd>{{ gap.severity }}</dd></div>
+    <div class="sg-summary-list__row"><dt>Strategic importance</dt><dd>{{ gap.strategicImportance }}</dd></div>
+    <div class="sg-summary-list__row"><dt>Horizon</dt><dd>{{ gap.horizon }}</dd></div>
+  </dl>
+
+  <h2 class="sg-heading-m">Problem statement</h2>
+  <p>{{ concept.problemStatement }}</p>
+
+  <h2 class="sg-heading-m">Strategic objective</h2>
+  <p>{{ concept.strategicObjective }}</p>
+
+  <h2 class="sg-heading-m">Key Stage 1 evidence</h2>
+  <ul class="sg-list sg-list--bullet">
+    {% for f in stage1.keyFacts %}<li>{{ f }}</li>{% endfor %}
+  </ul>
+
+  <h2 class="sg-heading-m">Users</h2>
+  <p><strong>Primary:</strong> {{ concept.users.primary }}<br>
+     <strong>Secondary:</strong> {{ concept.users.secondary }}</p>
+
+  <h2 class="sg-heading-m">Technology and data</h2>
+  <p>{{ concept.technology }}</p>
+  <p><strong>Data:</strong> {{ concept.data }}</p>
+
+  <h2 class="sg-heading-m">Benefits</h2>
+  <table class="sg-table">
+    <caption class="sg-table__caption sg-visually-hidden">SmartGrant benefits by area</caption>
+    <thead><tr><th scope="col">Area</th><th scope="col">Benefit</th></tr></thead>
+    <tbody>
+      {% for b in concept.benefits %}<tr><td>{{ b.area }}</td><td>{{ b.benefit }}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="sg-heading-m">Delivery roadmap</h2>
+  <table class="sg-table">
+    <caption class="sg-table__caption sg-visually-hidden">SmartGrant delivery roadmap by horizon</caption>
+    <thead><tr><th scope="col">Horizon</th><th scope="col">Milestone</th></tr></thead>
+    <tbody>
+      {% for d in concept.delivery %}<tr><td>{{ d.horizon }}</td><td>{{ d.item }}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="sg-heading-m">Risks and mitigations</h2>
+  <table class="sg-table">
+    <caption class="sg-table__caption sg-visually-hidden">SmartGrant risks and mitigations</caption>
+    <thead><tr><th scope="col">Type</th><th scope="col">Risk</th><th scope="col">Mitigation</th></tr></thead>
+    <tbody>
+      {% for r in concept.risks %}<tr><td>{{ r.type }}</td><td>{{ r.risk }}</td><td>{{ r.mitigation }}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="sg-heading-m">Success measures</h2>
+  <ul class="sg-list sg-list--bullet">
+    {% for s in concept.successMeasures %}<li>{{ s }}</li>{% endfor %}
+  </ul>
+</div>
+
+<h2 class="sg-heading-m">How SmartGrant scored against the other four concepts</h2>
+<p>Phase 7 weighted scoring matrix — scores 1–10, higher is always better; Delivery Risk scored
+inversely as Delivery Confidence. Weighted totals recomputed live from the raw scores and weights
+(and verified against the published Stage 2 figures by an automated test).</p>
+
+<div class="sg-table-scroll">
+  <table class="sg-table">
+    <caption class="sg-table__caption">Weighted scoring matrix (Stage 2, Phase 7)</caption>
+    <thead>
+      <tr>
+        <th scope="col">Criterion (weight)</th>
+        {% for p in scoreRows %}<th scope="col" class="sg-table__numeric">{{ p.name }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in criteria %}
+        <tr>
+          <th scope="row">{{ c.label }} ({{ c.weight }}%)</th>
+          {% for p in scoreRows %}<td class="sg-table__numeric">{{ p.scores[c.key] }}</td>{% endfor %}
+        </tr>
+      {% endfor %}
+      <tr>
+        <th scope="row"><strong>Weighted total</strong></th>
+        {% for p in scoreRows %}<td class="sg-table__numeric"><strong>{{ p.total | fixed2 }}</strong></td>{% endfor %}
+      </tr>
+      <tr>
+        <th scope="row"><strong>Rank</strong></th>
+        {% for p in scoreRows %}<td class="sg-table__numeric"><strong>{{ p.rank }}</strong></td>{% endfor %}
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 class="sg-heading-m">Sensitivity analysis</h2>
+<p>The three largest weights were varied by ±5 percentage points. SmartGrant ranks first under
+every scenario — the flagship choice is robust.</p>
+<div class="sg-table-scroll">
+  <table class="sg-table">
+    <caption class="sg-table__caption">Sensitivity analysis rankings (Stage 2, Phase 7)</caption>
+    <thead>
+      <tr><th scope="col">Scenario</th><th scope="col">1st</th><th scope="col">2nd</th><th scope="col">3rd</th><th scope="col">4th</th><th scope="col">5th</th></tr>
+    </thead>
+    <tbody>
+      {% for s in scenarios %}
+        <tr>
+          <th scope="row">{{ s.name }}</th>
+          {% for e in s.expected %}
+            <td>{{ e.name }} ({{ e.total | fixed2 }})</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="sg-two-thirds">
+  <h2 class="sg-heading-m">Why SmartGrant is the flagship</h2>
+  <p>{{ recommendation.why }}</p>
+  <div class="sg-inset-text">
+    <p><strong>The one honest caveat.</strong> {{ recommendation.caveat }}</p>
+  </div>
+  <p>This prototype embodies those mitigations: a narrow scope (mapping validation, risk triage
+  and casework for the schemes farmers already juggle), explainable advisory-only automation,
+  mandatory officer sign-off with a written rationale, and a complete audit trail.</p>
+</div>
+{% endblock %}

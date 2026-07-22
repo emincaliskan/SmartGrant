@@ -1,0 +1,67 @@
+{% extends "layout.njk" %}
+{% import "macros.njk" as m %}
+{% block content %}
+<div class="sg-two-thirds">
+  {{ m.errorSummary(errors) }}
+  <span class="sg-caption-l">{{ currentUser.business_name }}</span>
+  <h1 class="sg-heading-l">Apply for a grant</h1>
+  <p>Choose a scheme, the action you want funding for, and the land parcel it applies to.
+     Your claimed area is checked instantly against the land-parcel register.</p>
+
+  <form method="post" action="/apply" novalidate>
+    <input type="hidden" name="_csrf" value="{{ csrf }}">
+
+    <div class="sg-form-group {{ m.hasError(errors, 'scheme') }}">
+      <label class="sg-label" for="scheme">Scheme</label>
+      {{ m.fieldError(errors, 'scheme') }}
+      <select class="sg-select" id="scheme" name="scheme">
+        <option value="">Select a scheme</option>
+        {% for s in schemes %}
+          <option value="{{ s.code }}" {% if values.scheme == s.code %}selected{% endif %}>{{ s.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="sg-form-group {{ m.hasError(errors, 'action') }}">
+      <label class="sg-label" for="action">Action</label>
+      <div class="sg-hint" id="action-hint">Rates shown are demonstration rates only, not real scheme rates.</div>
+      {{ m.fieldError(errors, 'action') }}
+      <select class="sg-select" id="action" name="action" aria-describedby="action-hint">
+        <option value="">Select an action</option>
+        {% for s in schemes %}
+          <optgroup label="{{ s.name }}">
+            {% for a in s.actions %}
+              <option value="{{ a.code }}" {% if values.action == a.code %}selected{% endif %}>
+                {{ a.code }} — {{ a.title }} ({{ a.ratePerHa | money }}/ha)
+              </option>
+            {% endfor %}
+          </optgroup>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="sg-form-group {{ m.hasError(errors, 'parcel_ref') }}">
+      <label class="sg-label" for="parcel_ref">Land parcel reference</label>
+      <div class="sg-hint" id="parcel_ref-hint">Select a parcel from the register. Claims on unregistered parcels are routed for manual mapping checks.</div>
+      {{ m.fieldError(errors, 'parcel_ref') }}
+      <select class="sg-select" id="parcel_ref" name="parcel_ref" aria-describedby="parcel_ref-hint">
+        <option value="">Select a parcel</option>
+        {% for p in parcels %}
+          <option value="{{ p.parcel_ref }}" {% if values.parcel_ref == p.parcel_ref %}selected{% endif %}>
+            {{ p.parcel_ref }} — {{ p.area_ha }} ha, {{ p.land_cover }}, {{ p.county }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {{ m.input(errors, 'claimed_area', 'Area you are claiming (hectares)', values.claimed_area, 'text', 'For example, 10.5. This is validated against the registered parcel area.', '', 'sg-input--width-10') }}
+
+    <div class="sg-form-group">
+      <label class="sg-label" for="notes">Anything else we should know (optional)</label>
+      <textarea class="sg-textarea" id="notes" name="notes" rows="4">{{ values.notes }}</textarea>
+    </div>
+
+    <button type="submit" class="sg-button">Submit application</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "layout.njk" %}
+{% import "macros.njk" as m %}
+{% block content %}
+<div class="sg-two-thirds">
+  {{ m.errorSummary(errors) }}
+  <h1 class="sg-heading-l">Sign in</h1>
+
+  <form method="post" action="/login" novalidate>
+    <input type="hidden" name="_csrf" value="{{ csrf }}">
+    <input type="hidden" name="next" value="{{ next }}">
+    {{ m.input(errors, 'email', 'Email address', values.email, 'email', '', 'email') }}
+    {{ m.input(errors, 'password', 'Password', '', 'password', '', 'current-password') }}
+    <button type="submit" class="sg-button">Sign in</button>
+  </form>
+
+  <p>No account yet? <a href="/register">Create one</a>.</p>
+  <div class="sg-inset-text">
+    <p class="sg-body-s">Demo sign-ins — farmer: <code>farmer@farm.demo</code> / <code>FarmerDemo1</code> · officer: <code>officer@rpa.demo</code> / <code>OfficerDemo1</code></p>
+  </div>
+</div>
+{% endblock %}
