@@ -1,0 +1,45 @@
+{% extends "layout.njk" %}
+{% import "macros.njk" as m %}
+{% block content %}
+{% if notice %}
+  <div class="sg-notification-banner sg-notification-banner--success" role="alert">
+    <h2 class="sg-notification-banner__title">Success</h2>
+    <p>{{ notice }}</p>
+  </div>
+{% endif %}
+
+<span class="sg-caption-l">{{ currentUser.business_name }} · SBI {{ currentUser.sbi }}</span>
+<h1 class="sg-heading-l">Your grant applications</h1>
+
+<p><a href="/apply" class="sg-button">Apply for a grant</a></p>
+
+{% if applications.length %}
+  <table class="sg-table">
+    <caption class="sg-table__caption sg-visually-hidden">Your grant applications and their status</caption>
+    <thead>
+      <tr>
+        <th scope="col">Reference</th>
+        <th scope="col">Scheme and action</th>
+        <th scope="col">Parcel</th>
+        <th scope="col" class="sg-table__numeric">Amount</th>
+        <th scope="col">Submitted</th>
+        <th scope="col">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in applications %}
+        <tr>
+          <td><a href="/applications/{{ a.id }}">{{ a.reference }}</a></td>
+          <td>{{ a.scheme }} — {{ a.action_title }}</td>
+          <td>{{ a.parcel_ref }}</td>
+          <td class="sg-table__numeric">{{ a.amount | money }}</td>
+          <td>{{ a.submitted_at | date }}</td>
+          <td>{{ m.statusTag(a.status) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>You have not applied for anything yet. Your applications and their progress will appear here.</p>
+{% endif %}
+{% endblock %}

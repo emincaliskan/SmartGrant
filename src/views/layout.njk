@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" class="sg-template">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} — SmartGrant</title>
+  <meta name="description" content="SmartGrant — AI-assisted grant administration and mapping prototype for Defra and the Rural Payments Agency.">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body class="sg-body">
+  <a href="#main-content" class="sg-skip-link">Skip to main content</a>
+
+  <header class="sg-header" role="banner">
+    <div class="sg-width-container sg-header__container">
+      <a href="/" class="sg-header__logo">
+        <span class="sg-header__logotype">SmartGrant</span>
+        <span class="sg-header__product-tag">Defra · Rural Payments</span>
+      </a>
+      <nav class="sg-header__nav" aria-label="Account">
+        <ul>
+          {% if currentUser %}
+            {% if currentUser.role == 'officer' %}
+              <li><a href="/casework">Casework</a></li>
+              <li><a href="/reports">Reports</a></li>
+            {% else %}
+              <li><a href="/dashboard">Your applications</a></li>
+              <li><a href="/apply">Apply</a></li>
+            {% endif %}
+            <li><a href="/about">Evidence</a></li>
+            <li>
+              <form action="/logout" method="post" class="sg-inline-form">
+                <input type="hidden" name="_csrf" value="{{ csrf }}">
+                <button type="submit" class="sg-link-button">Sign out ({{ currentUser.full_name }})</button>
+              </form>
+            </li>
+          {% else %}
+            <li><a href="/about">Evidence</a></li>
+            <li><a href="/login">Sign in</a></li>
+            <li><a href="/register">Create account</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="sg-width-container">
+    <div class="sg-phase-banner">
+      <strong class="sg-tag sg-tag--phase">Prototype</strong>
+      <span>This is a demonstration service, not an official GOV.UK product. Data entered here is demo data only.</span>
+    </div>
+
+    <main id="main-content" class="sg-main" role="main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <footer class="sg-footer" role="contentinfo">
+    <div class="sg-width-container sg-footer__inner">
+      <ul class="sg-footer__links">
+        <li><a href="/about">Evidence base</a></li>
+        <li><a href="/accessibility">Accessibility</a></li>
+      </ul>
+      <p>SmartGrant prototype — Concept 1 of the Defra AI Opportunity Assessment (Stage 3). GOV.UK-inspired styling; not an official government service.</p>
+    </div>
+  </footer>
+</body>
+</html>

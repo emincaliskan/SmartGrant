@@ -1,0 +1,113 @@
+{% extends "layout.njk" %}
+{% import "macros.njk" as m %}
+{% block content %}
+<p><a href="/casework" class="sg-back-link">Back to casework queue</a></p>
+
+{{ m.errorSummary(errors) }}
+
+<span class="sg-caption-l">{{ application.scheme }} · {{ application.business_name }}</span>
+<h1 class="sg-heading-l">Case {{ application.reference }}</h1>
+<p>{{ m.statusTag(application.status) }} {{ m.riskTag(application.risk_band) }}</p>
+
+<div class="sg-grid-row">
+  <div class="sg-two-thirds">
+    <h2 class="sg-heading-m">Claim details</h2>
+    <dl class="sg-summary-list">
+      <div class="sg-summary-list__row"><dt>Applicant</dt><dd>{{ application.applicant_name }} ({{ application.applicant_email }})</dd></div>
+      <div class="sg-summary-list__row"><dt>Business</dt><dd>{{ application.business_name }} · SBI {{ application.sbi }}</dd></div>
+      <div class="sg-summary-list__row"><dt>Action</dt><dd>{{ application.action_code }} — {{ application.action_title }}</dd></div>
+      <div class="sg-summary-list__row"><dt>Land parcel</dt><dd>{{ application.parcel_ref }}</dd></div>
+      <div class="sg-summary-list__row"><dt>Claimed area</dt><dd>{{ application.claimed_area }} ha</dd></div>
+      <div class="sg-summary-list__row"><dt>Amount</dt><dd>{{ application.amount | money }}</dd></div>
+      <div class="sg-summary-list__row"><dt>Submitted</dt><dd>{{ application.submitted_at | date }}</dd></div>
+      {% if application.notes %}
+        <div class="sg-summary-list__row"><dt>Applicant notes</dt><dd>{{ application.notes }}</dd></div>
+      {% endif %}
+    </dl>
+
+    <h2 class="sg-heading-m">Mapping validation</h2>
+    <div class="sg-inset-text {% if mapping.verdict == 'over' or mapping.verdict == 'not_found' %}sg-inset-text--warning{% endif %}">
+      <p>{{ mapping.message }}</p>
+      {% if mapping.found %}
+        <p class="sg-body-s">Registered: {{ mapping.registeredArea }} ha · {{ mapping.landCover }} · {{ mapping.county }}</p>
+      {% endif %}
+    </div>
+
+    <h2 class="sg-heading-m">Automated triage — advisory only</h2>
+    {% if flags.length %}
+      <p>Priority score {{ application.risk_score }} ({{ application.risk_band }}). Reasons:</p>
+      <ul class="sg-list sg-list--bullet">
+        {% for f in flags %}
+          <li>{{ f.reason }} <span class="sg-body-s">(+{{ f.points }})</span></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No risk flags were raised. Priority score 0 (Low).</p>
+    {% endif %}
+    <div class="sg-inset-text">
+      <p>These checks prioritise the queue and explain themselves. They make no determinations —
+      the decision below is yours, and your written rationale is recorded in the audit trail.</p>
+    </div>
+
+    {% if canDecide or canPay %}
+      <h2 class="sg-heading-m">Your decision</h2>
+      <form method="post" action="/casework/{{ application.id }}/decision" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <div class="sg-form-group">
+          <fieldset class="sg-fieldset">
+            <legend class="sg-label">What do you want to do?</legend>
+            <div class="sg-radios">
+              {% if application.status == 'submitted' %}
+                <div class="sg-radios__item">
+                  <input class="sg-radios__input" id="d-start" name="decision" type="radio" value="start_review">
+                  <label class="sg-radios__label" for="d-start">Start review (mark as in review)</label>
+                </div>
+              {% endif %}
+              {% if canDecide %}
+                <div class="sg-radios__item">
+                  <input class="sg-radios__input" id="d-approve" name="decision" type="radio" value="approve">
+                  <label class="sg-radios__label" for="d-approve">Approve the claim</label>
+                </div>
+                <div class="sg-radios__item">
+                  <input class="sg-radios__input" id="d-info" name="decision" type="radio" value="request_info">
+                  <label class="sg-radios__label" for="d-info">Request more information from the applicant</label>
+                </div>
+                <div class="sg-radios__item">
+                  <input class="sg-radios__input" id="d-reject" name="decision" type="radio" value="reject">
+                  <label class="sg-radios__label" for="d-reject">Reject the claim</label>
+                </div>
+              {% endif %}
+              {% if canPay %}
+                <div class="sg-radios__item">
+                  <input class="sg-radios__input" id="d-pay" name="decision" type="radio" value="record_payment">
+                  <label class="sg-radios__label" for="d-pay">Record payment as issued</label>
+                </div>
+              {% endif %}
+            </div>
+          </fieldset>
+        </div>
+        <div class="sg-form-group {{ m.hasError(errors, 'note') }}">
+          <label class="sg-label" for="note">Reason for your decision</label>
+          <div class="sg-hint" id="note-hint">Required for approve, reject and information requests. Recorded in the audit trail and shown to the applicant.</div>
+          {{ m.fieldError(errors, 'note') }}
+          <textarea class="sg-textarea" id="note" name="note" rows="4" aria-describedby="note-hint"></textarea>
+        </div>
+        <button type="submit" class="sg-button">Confirm decision</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <div class="sg-one-third">
+    <h2 class="sg-heading-s">Case history</h2>
+    <ol class="sg-timeline">
+      {% for e in events %}
+        <li class="sg-timeline__item">
+          <p class="sg-timeline__title">{{ e.action | capitalize }} — {{ e.actor_name }}</p>
+          {% if e.detail %}<p class="sg-timeline__detail">{{ e.detail }}</p>{% endif %}
+          <p class="sg-timeline__date">{{ e.created_at | date }}</p>
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+</div>
+{% endblock %}

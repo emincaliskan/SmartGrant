@@ -1,0 +1,54 @@
+{% extends "layout.njk" %}
+{% import "macros.njk" as m %}
+{% block content %}
+{% if justSubmitted %}
+  <div class="sg-panel sg-panel--confirmation">
+    <h1 class="sg-panel__title">Application submitted</h1>
+    <div class="sg-panel__body">Your reference<br><strong>{{ application.reference }}</strong></div>
+  </div>
+{% endif %}
+
+<p><a href="/dashboard" class="sg-back-link">Back to your applications</a></p>
+
+<span class="sg-caption-l">{{ application.scheme }}</span>
+<h1 class="sg-heading-l">Application {{ application.reference }}</h1>
+<p>{{ m.statusTag(application.status) }}</p>
+
+<h2 class="sg-heading-m">Details</h2>
+<dl class="sg-summary-list">
+  <div class="sg-summary-list__row"><dt>Action</dt><dd>{{ application.action_code }} — {{ application.action_title }}</dd></div>
+  <div class="sg-summary-list__row"><dt>Land parcel</dt><dd>{{ application.parcel_ref }}</dd></div>
+  <div class="sg-summary-list__row"><dt>Claimed area</dt><dd>{{ application.claimed_area }} ha</dd></div>
+  <div class="sg-summary-list__row"><dt>Amount</dt><dd>{{ application.amount | money }}</dd></div>
+  <div class="sg-summary-list__row"><dt>Submitted</dt><dd>{{ application.submitted_at | date }}</dd></div>
+  {% if application.decided_at %}
+    <div class="sg-summary-list__row"><dt>Decision date</dt><dd>{{ application.decided_at | date }}</dd></div>
+    <div class="sg-summary-list__row"><dt>Decision reason</dt><dd>{{ application.decision_note }}</dd></div>
+  {% endif %}
+  {% if application.paid_at %}
+    <div class="sg-summary-list__row"><dt>Paid</dt><dd>{{ application.paid_at | date }}</dd></div>
+  {% endif %}
+</dl>
+
+<h2 class="sg-heading-m">Mapping validation</h2>
+<div class="sg-inset-text">
+  <p>{{ mapping.message }}</p>
+</div>
+
+<h2 class="sg-heading-m">History</h2>
+<ol class="sg-timeline">
+  {% for e in events %}
+    <li class="sg-timeline__item">
+      <p class="sg-timeline__title">{{ e.action | capitalize }} — {{ e.actor_name }}</p>
+      {% if e.detail %}<p class="sg-timeline__detail">{{ e.detail }}</p>{% endif %}
+      <p class="sg-timeline__date">{{ e.created_at | date }}</p>
+    </li>
+  {% endfor %}
+</ol>
+
+<div class="sg-inset-text">
+  <p><strong>How your application is handled.</strong> Automated checks only prioritise the casework
+  queue — they never decide. A named RPA case officer reviews and signs off every decision, and the
+  full history is recorded above.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{
+  "name": "smartgrant",
+  "version": "1.0.0",
+  "description": "SmartGrant — AI-assisted grant administration and mapping for Defra / RPA (prototype). Concept 1 of the Defra AI Opportunity Assessment, Stage 3.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node src/seed.js",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "nunjucks": "^3.2.4"
+  },
+  "license": "MIT"
+}

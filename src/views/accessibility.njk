@@ -1,0 +1,15 @@
+{% extends "layout.njk" %}
+{% block content %}
+<div class="sg-two-thirds">
+  <h1 class="sg-heading-l">Accessibility statement</h1>
+  <p>This prototype is built to meet WCAG 2.2 AA principles:</p>
+  <ul class="sg-list sg-list--bullet">
+    <li>every page is fully keyboard navigable, with a skip link and visible focus states</li>
+    <li>semantic HTML landmarks (header, main, footer, nav) and correctly labelled forms</li>
+    <li>colour contrast meets AA ratios; status is never conveyed by colour alone — tags carry text</li>
+    <li>error messages follow the GOV.UK error-summary pattern and link to the field in error</li>
+    <li>no JavaScript is required to use any part of the service</li>
+  </ul>
+  <p>This is a demonstration service. A live service would publish a full statement including testing results and a feedback route.</p>
+</div>
+{% endblock %}

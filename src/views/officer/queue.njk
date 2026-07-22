@@ -1,0 +1,78 @@
+{% extends "layout.njk" %}
+{% import "macros.njk" as m %}
+{% block content %}
+<span class="sg-caption-l">Rural Payments Agency</span>
+<h1 class="sg-heading-l">Casework queue</h1>
+
+<div class="sg-stat-row">
+  <div class="sg-stat"><span class="sg-stat__number">{{ counts.open }}</span><span class="sg-stat__label">open cases</span></div>
+  <div class="sg-stat"><span class="sg-stat__number">{{ counts.high }}</span><span class="sg-stat__label">high-priority open cases</span></div>
+</div>
+
+<p>Cases are ordered by triage priority, then oldest first. Triage is advisory — every decision is yours.</p>
+
+<form method="get" action="/casework" class="sg-filter-bar">
+  <div class="sg-filter-bar__item">
+    <label class="sg-label sg-label--s" for="status">Status</label>
+    <select class="sg-select" id="status" name="status">
+      <option value="">All</option>
+      {% for s in [['submitted','Submitted'],['in_review','In review'],['info_requested','Information requested'],['approved','Approved'],['rejected','Rejected'],['paid','Paid']] %}
+        <option value="{{ s[0] }}" {% if filters.status == s[0] %}selected{% endif %}>{{ s[1] }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="sg-filter-bar__item">
+    <label class="sg-label sg-label--s" for="scheme">Scheme</label>
+    <select class="sg-select" id="scheme" name="scheme">
+      <option value="">All</option>
+      {% for s in schemes %}
+        <option value="{{ s.code }}" {% if filters.scheme == s.code %}selected{% endif %}>{{ s.code }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="sg-filter-bar__item">
+    <label class="sg-label sg-label--s" for="band">Triage priority</label>
+    <select class="sg-select" id="band" name="band">
+      <option value="">All</option>
+      {% for b in ['High','Medium','Low'] %}
+        <option value="{{ b }}" {% if filters.band == b %}selected{% endif %}>{{ b }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="sg-filter-bar__item">
+    <button type="submit" class="sg-button sg-button--secondary">Apply filters</button>
+  </div>
+</form>
+
+{% if applications.length %}
+  <table class="sg-table">
+    <caption class="sg-table__caption sg-visually-hidden">Grant applications in the casework queue</caption>
+    <thead>
+      <tr>
+        <th scope="col">Reference</th>
+        <th scope="col">Business</th>
+        <th scope="col">Scheme</th>
+        <th scope="col">Parcel</th>
+        <th scope="col" class="sg-table__numeric">Amount</th>
+        <th scope="col">Triage</th>
+        <th scope="col">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in applications %}
+        <tr>
+          <td><a href="/casework/{{ a.id }}">{{ a.reference }}</a></td>
+          <td>{{ a.business_name }}</td>
+          <td>{{ a.scheme }}</td>
+          <td>{{ a.parcel_ref }}</td>
+          <td class="sg-table__numeric">{{ a.amount | money }}</td>
+          <td>{{ m.riskTag(a.risk_band) }}</td>
+          <td>{{ m.statusTag(a.status) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No applications match these filters.</p>
+{% endif %}
+{% endblock %}

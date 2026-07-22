@@ -1,0 +1,49 @@
+{% extends "layout.njk" %}
+{% block content %}
+<span class="sg-caption-l">Rural Payments Agency</span>
+<h1 class="sg-heading-l">Delivery reports</h1>
+<p>Live metrics from this service's database, aligned to the success measures the Stage 2
+assessment set for SmartGrant: payments on time, mapping-error and rework rates, complaint
+volumes, applicant satisfaction and officer hours saved.</p>
+
+<div class="sg-stat-row">
+  <div class="sg-stat"><span class="sg-stat__number">{{ metrics.total }}</span><span class="sg-stat__label">applications received</span></div>
+  <div class="sg-stat"><span class="sg-stat__number">{{ metrics.open }}</span><span class="sg-stat__label">open cases</span></div>
+  <div class="sg-stat"><span class="sg-stat__number">{{ metrics.decided }}</span><span class="sg-stat__label">decisions made</span></div>
+  <div class="sg-stat"><span class="sg-stat__number">{{ metrics.paid }}</span><span class="sg-stat__label">payments issued</span></div>
+</div>
+
+<h2 class="sg-heading-m">Success measures</h2>
+<table class="sg-table">
+  <caption class="sg-table__caption sg-visually-hidden">Delivery metrics against SmartGrant success measures</caption>
+  <thead><tr><th scope="col">Measure</th><th scope="col">Current value</th><th scope="col">Notes</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Payments made within 30 days of approval</td>
+      <td>{% if metrics.paidOnTimePct !== null %}{{ metrics.paidOnTimePct }}%{% else %}No payments yet{% endif %}</td>
+      <td>Proxy for the "% payments on time" success measure.</td>
+    </tr>
+    <tr>
+      <td>Applications with mapping queries</td>
+      <td>{% if metrics.mappingFlaggedPct !== null %}{{ metrics.mappingFlagged }} ({{ metrics.mappingFlaggedPct }}%){% else %}—{% endif %}</td>
+      <td>Claims where automated mapping validation raised an area or register query.</td>
+    </tr>
+    <tr>
+      <td>Average days from submission to decision</td>
+      <td>{% if metrics.avgDecisionDays %}{{ metrics.avgDecisionDays }} days{% else %}No decisions yet{% endif %}</td>
+      <td>Lower is better; triage aims to cut this by prioritising review effort.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="sg-heading-m">Cases by triage priority</h2>
+<table class="sg-table sg-table--narrow">
+  <caption class="sg-table__caption sg-visually-hidden">Number of applications by triage priority band</caption>
+  <thead><tr><th scope="col">Priority band</th><th scope="col" class="sg-table__numeric">Cases</th></tr></thead>
+  <tbody>
+    {% for b in metrics.byBand %}
+      <tr><td>{{ b.risk_band }}</td><td class="sg-table__numeric">{{ b.n }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
